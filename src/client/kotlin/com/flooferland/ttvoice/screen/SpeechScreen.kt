@@ -308,6 +308,8 @@ class SpeechScreen() : Screen(Component.literal("Speech screen")) {
         SpeechUtil.shutUp()
     }
 
+    override fun isPauseScreen() = false
+
     /// Speech history widget
     private abstract class HistoryWidget : AbstractSelectionList<SpeechScreen.HistoryWidget.Entry> {
         val screen: SpeechScreen

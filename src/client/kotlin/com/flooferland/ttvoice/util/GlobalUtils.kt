@@ -3,14 +3,19 @@ package com.flooferland.ttvoice.util
 import com.flooferland.ttvoice.TextToVoiceClient
 import net.minecraft.resources.*
 
-/** Creates a [ResourceLocation] using the [com.flooferland.ttvoice.TextToVoiceClient.MOD_ID] namespace */
+/** Creates an identifier using the [com.flooferland.ttvoice.TextToVoiceClient.MOD_ID] namespace */
 fun rl(path: String) = rlCustom(TextToVoiceClient.MOD_ID, path)
 
-/** Creates a [ResourceLocation] using the vanilla Minecraft namespace */
-fun rlVanilla(path: String) = rlCustom(ResourceLocation.DEFAULT_NAMESPACE, path)
+/** Creates an identifier using the vanilla Minecraft namespace */
+fun rlVanilla(path: String) = rlCustom("minecraft", path)
 
-/** Creates a [ResourceLocation] using a custom namespace */
-fun rlCustom(namespace: String, path: String) = ResourceLocation.tryBuild(namespace, path)!!
+/** Creates an identifier using a custom namespace */
+fun rlCustom(namespace: String, path: String) =
+    //? if >1.21.10 {
+    /*Identifier.tryBuild(namespace, path)!!
+    *///? } else {
+    ResourceLocation.tryBuild(namespace, path)!!
+    //? }
 
 fun <E> MutableList<E>.copy(): MutableList<E> {
     return ArrayList(this)

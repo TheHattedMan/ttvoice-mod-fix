@@ -5,7 +5,8 @@ import com.flooferland.ttvoice.data.ModState;
 import com.flooferland.ttvoice.speech.SpeechUtil;
 import de.maxhenkel.voicechat.voice.client.RenderEvents;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+/*? if >1.21.10 */ //import net.minecraft.resources.Identifier;
+/*? if <1.21.10 */ import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -39,9 +40,17 @@ interface RenderEventsAccessor {
 	@Invoker(value = "shouldShowIcons", remap = false)
 	boolean callShouldShowIcons();
 
+	//? if >1.21.10 {
+	/*@Invoker("renderIcon")
+	void callRenderIcon(GuiGraphics guiGraphics, Identifier texture);
+
+	@Accessor("MICROPHONE_ICON")
+	static Identifier getSpeakerIcon() { return null; }
+	*///? } else {
 	@Invoker("renderIcon")
 	void callRenderIcon(GuiGraphics guiGraphics, ResourceLocation texture);
 
 	@Accessor("MICROPHONE_ICON")
 	static ResourceLocation getSpeakerIcon() { return null; }
+	//? }
 }

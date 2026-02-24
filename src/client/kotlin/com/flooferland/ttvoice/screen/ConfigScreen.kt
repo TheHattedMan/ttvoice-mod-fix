@@ -64,7 +64,7 @@ class ConfigScreen(val parent: Screen) : Screen(title) {
             donationWidgets.forEach { it.visible = (value == null) }
             if (error == null) {
                 if (value != null) {
-                    noticeLabel.message = Component.literal(value.message)
+                    noticeLabel.message = Component.literal(value.message ?: value.toString())
                         .setStyle(Style.EMPTY.applyFormats(ChatFormatting.YELLOW, ChatFormatting.BOLD))
                     noticeLabel.visible = true
                 } else {
@@ -239,11 +239,9 @@ class ConfigScreen(val parent: Screen) : Screen(title) {
                         // TTS backend cycling button
                         AudioConfig::ttsBackend.name -> {
                             size = Vector2Int(300, 18)
-                            val b = CycleButton.Builder<TextToVoiceConfig.TTSBackend>()
-                                { v -> Component.literal(v::name.get()) }
+                            val b = Utils.createCycleButton({ Component.literal(it::name.get()) }, fieldInitialValue as TextToVoiceConfig.TTSBackend)
                                 .withTooltip { t -> Tooltip.create(Component.literal("The backend TTS system")) }
                                 .withValues(TextToVoiceConfig.TTSBackend::entries.get())
-                                .withInitialValue(fieldInitialValue as TextToVoiceConfig.TTSBackend)
                                 .create(position.x, position.y, size.x, size.y, labelText)
                                 { b, v ->
                                     /*if (v == TextToVoiceConfig.TTSBackend.Lua) {
@@ -279,11 +277,9 @@ class ConfigScreen(val parent: Screen) : Screen(title) {
                                 error = Error("Native call failed. Make sure you're using the right Java version (initialVoice == null)")
                                 break;
                             }
-                            val b = CycleButton.Builder<Espeak.Voice>()
-                                { v -> Component.literal(v.name) }
+                            val b = Utils.createCycleButton({ Component.literal(it.name) }, initialVoice)
                                 .withTooltip { t -> Tooltip.create(Component.literal("The TTS voice preset.\n\nShift-click to scroll back.")) }
                                 .withValues(voices)
-                                .withInitialValue(initialVoice)
                                 .create(position.x, position.y, size.x, size.y, labelText)
                                 { b, v ->
                                     currentConfig.voice.espeak.name = v.identifier
@@ -416,10 +412,6 @@ class ConfigScreen(val parent: Screen) : Screen(title) {
         ModConfig.save()
         SatisfyingNoises.playSuccess()
         saveButton.active = false
-    }
-
-    override fun resize(client: Minecraft, width: Int, height: Int) {
-        super.resize(client, width, height)
     }
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {

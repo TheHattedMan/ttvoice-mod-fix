@@ -1,19 +1,19 @@
 val java = if (stonecutter.eval(stonecutter.current.version, ">=1.20.5"))
     JavaVersion.VERSION_21 else JavaVersion.VERSION_17
-val kotlinVersion = "2.2.20"
+val kotlinVersion = "2.3.10"
 val loader = stonecutter.current.project.split("-").last()
 val isFabric = loader == "fabric"
 val isNeoforge = loader == "neoforge"
 val hasFigura = isFabric && stonecutter.eval(stonecutter.current.version, "<=${property("latest_figura_mc_version")}")
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    id("com.google.devtools.ksp") version "2.2.20-2.0.2"
+    kotlin("jvm") version "2.3.10"
+    id("com.google.devtools.ksp") version "2.3.5"
     id("dev.kikugie.stonecutter")
     id("dev.kikugie.fletching-table.fabric") version "0.1.0-alpha.22"
     id("dev.kikugie.fletching-table.neoforge") version "0.1.0-alpha.22"
-    id("fabric-loom") version "1.13-SNAPSHOT"
-    id("me.modmuss50.mod-publish-plugin") version "1.0.0"
+    id("fabric-loom") version "1.15-SNAPSHOT"
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
     /*if (isNeoforge) {
         id("net.neoforged.moddev") version "2.0.120"
     }*/

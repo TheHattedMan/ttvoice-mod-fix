@@ -8,6 +8,7 @@ import net.minecraft.client.*
 import net.minecraft.client.gui.components.*
 import net.minecraft.client.gui.screens.*
 import net.minecraft.network.chat.*
+import com.flooferland.ttvoice.util.Utils
 import javax.sound.sampled.AudioSystem
 
 // TODO: Fix bug where resizing the window makes the several button layout no longer show the selected device
@@ -81,8 +82,10 @@ class SelectDeviceScreen(val parent: Screen) : Screen(Component.literal("Audio d
             }
 
             // Backup in case the screen is too small
-            singleButton = CycleButton.builder<Int>()
-                { v -> Component.literal(mixers.getOrNull(ModState.config.audio.device)?.name ?: "Unknown") }
+            singleButton = Utils.createCycleButton(
+                { Component.literal(mixers.getOrNull(ModState.config.audio.device)?.name ?: "Unknown") },
+                ModState.config.audio.device
+            )
                 .withValues((mixers.size downTo 0).toList())
                 .create(
                     (width / 2)  - (buttonSize.x / 2), height / 2,
@@ -107,11 +110,6 @@ class SelectDeviceScreen(val parent: Screen) : Screen(Component.literal("Audio d
         if (Minecraft.getInstance().level == null && SpeechUtil.isInitialized()) {
             SpeechUtil.unload()
         }
-    }
-
-    override fun resize(client: Minecraft, width: Int, height: Int) {
-        super.resize(client, width, height)
-        updateVisibility()
     }
 
     fun updateVisibility() {

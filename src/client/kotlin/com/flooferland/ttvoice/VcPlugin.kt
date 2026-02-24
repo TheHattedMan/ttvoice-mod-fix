@@ -4,16 +4,22 @@ import com.flooferland.ttvoice.data.AudioScheduler
 import com.flooferland.ttvoice.data.ModState
 import de.maxhenkel.voicechat.api.VoicechatClientApi
 import de.maxhenkel.voicechat.api.VoicechatPlugin
-import de.maxhenkel.voicechat.api.audiochannel.ClientAudioChannel
 import de.maxhenkel.voicechat.api.events.ClientVoicechatConnectionEvent
 import de.maxhenkel.voicechat.api.events.EventRegistration
 import de.maxhenkel.voicechat.api.events.MergeClientSoundEvent
 import net.minecraft.client.Minecraft
+import de.maxhenkel.voicechat.api.VolumeCategory
+import de.maxhenkel.voicechat.api.audiochannel.ClientEntityAudioChannel
+import de.maxhenkel.voicechat.api.audiochannel.ClientStaticAudioChannel
+import de.maxhenkel.voicechat.api.audiochannel.StaticAudioChannel
+import java.util.UUID
 
 public class VcPlugin : VoicechatPlugin {
     companion object {
         var api: VoicechatClientApi? = null
-        var channel: ClientAudioChannel? = null
+        var clientChannel: ClientStaticAudioChannel? = null
+        var volumeCategory: VolumeCategory? = null
+        var uuid: UUID? = null
         val scheduler = AudioScheduler()
 
         val modName: String
@@ -40,8 +46,18 @@ public class VcPlugin : VoicechatPlugin {
 
         registration.registerEvent(ClientVoicechatConnectionEvent::class.java, { packet ->
             api = packet.voicechat
-            channel = api!!.createStaticAudioChannel(Minecraft.getInstance().player!!.uuid)
-            //channel = api!!.createEntityAudioChannel(UUID.randomUUID(), api!!.fromEntity(Minecraft.getInstance().player))
+            if (packet.isConnected && api != null) {
+                volumeCategory = api?.volumeCategoryBuilder()
+                    ?.setId("${TextToVoiceClient.MOD_ID}_voice")
+                    ?.setName("Text-To-Voice")
+                    ?.build()
+                    .also { api?.registerClientVolumeCategory(it) }
+                uuid = UUID.nameUUIDFromBytes((Minecraft.getInstance().player!!.uuid.toString() + "-ttvoice").toByteArray())
+                // clientChannel = api?.createEntityAudioChannel(uuid, api?.fromEntity(Minecraft.getInstance().player!!))?.also { it.category = volumeCategory?.id }
+                clientChannel = api?.createStaticAudioChannel(uuid)?.also { it.category = volumeCategory?.id }
+            } else {
+                volumeCategory.let { api?.unregisterClientVolumeCategory(volumeCategory) }
+            }
         }, 10)
 
         // NOTE: SVC expects 48,000 hz audio at 16 bits mono. (consistent 960 frame size)
@@ -50,7 +66,7 @@ public class VcPlugin : VoicechatPlugin {
             val frame = scheduler.next() ?: return@registerEvent
             packet.mergeAudio(frame)
             if (ModState.config.general.hearSelf) {
-                channel?.play(frame)
+                clientChannel?.play(frame)
             }
         }, 10)
     }

@@ -29,11 +29,11 @@ object ModCommands {
         MixerSetExact("mixer setExact");
 
         val command: String
-        val subcommand: String?
+        val subcommand: String
         init {
             val path = path.split(" ");
             command = path[0]
-            subcommand = path.getOrNull(1)
+            subcommand = path.getOrNull(1) ?: ""
         }
 
         fun withParams(vararg params: Any): String {

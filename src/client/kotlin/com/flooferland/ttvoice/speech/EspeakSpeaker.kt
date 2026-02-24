@@ -173,6 +173,12 @@ class EspeakSpeaker : ISpeaker {
             val end = (playhead + BUFFER_SIZE).coerceAtMost(pcm.size)
             val chunk = pcm.sliceArray(playhead until end)
             playhead += BUFFER_SIZE
+
+            if (chunk.size < BUFFER_SIZE) {
+                val padded = ShortArray(BUFFER_SIZE)
+                System.arraycopy(chunk, 0, padded, 0, chunk.size)
+                return padded
+            }
             return chunk
         }
 
@@ -246,6 +252,6 @@ class EspeakSpeaker : ISpeaker {
         const val BUFFER_SIZE = (OUTPUT_SAMPLERATE * FRAME_MS) / 1_000
 
         /** Input sample rate, filled by eSpeak */
-        var sampleRate = -1
+        var sampleRate = 22050
     }
 }

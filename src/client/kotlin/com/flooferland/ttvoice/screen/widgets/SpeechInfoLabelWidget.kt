@@ -45,7 +45,11 @@ class SpeechInfoLabelWidget(val screen: SpeechScreen, val font: Font) : Abstract
     override fun onPress() = onPressed()
     //?}
 
+    //? if >1.21.10 {
+    /*override fun renderContents(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) = render(context)
+    *///? } else {
     override fun renderWidget(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) = render(context)
+    //? }
 
     fun update() {
         val devices = AudioSystem.getMixerInfo()
