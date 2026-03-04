@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.*
 import net.minecraft.commands.*
 import net.minecraft.network.chat.*
+import com.flooferland.espeak.Espeak
 import javax.sound.sampled.AudioSystem
 
 @Suppress("unused")
@@ -62,7 +63,16 @@ object ModCommands {
 
     fun setVoice(context: CommandContext<FabricClientCommandSource>): Int {
         val voice = getString(context, "voice")
-        // TODO
+        val substr = voice.substringAfterLast('(').substringBeforeLast(')')
+        val num = substr.toIntOrNull() ?: voice.toIntOrNull()
+        if (num == null) {
+            context.source.sendError(Component.literal("Argument '$substr' is not a valid voice"))
+            return 0
+        }
+
+        ModState.config.voice.espeak.name = Espeak.listVoices()[num].name
+        SpeechUtil.updateVoice(ModState.config.voice.espeak.name)
+        context.source.sendFeedback(Component.literal("New voice set as '${ModState.config.voice.espeak.name}'! ($num)"))
         return 1
     }
 
@@ -172,10 +182,10 @@ object ModCommands {
                         ClientCommandManager.literal(Commands.VoiceSet.command)
                             .then(
                                 ClientCommandManager.literal(Commands.VoiceSetExact.subcommand).then(
-                                    argument("voice", integer())
+                                    argument("voice", greedyString())
                                         .executes(ModCommands::setVoice)
                                         .suggests({ context, builder ->
-                                            val mixers = SpeechUtil.getVoices().mapIndexed { i, voice -> "($i) ${voice.name}" }
+                                            val mixers = SpeechUtil.getVoices().mapIndexed { i, voice -> "${voice.name} ($i)" }
                                             SharedSuggestionProvider.suggest(mixers, builder)
                                         })
                                 )
