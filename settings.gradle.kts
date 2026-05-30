@@ -33,5 +33,6 @@ stonecutter {
         mc("1.21.7", arrayOf("fabric", "neoforge"))
         mc("1.21.9", arrayOf("fabric", "neoforge"))
         mc("1.21.11", arrayOf("fabric", "neoforge"))
+        mc("26.1.2", arrayOf("fabric"))
     }
 }
