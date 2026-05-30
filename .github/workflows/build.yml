@@ -120,10 +120,10 @@ jobs:
             
             - name: Clean up native folder in case there are existing files in the repo
               run: |
-                mkdir -p src/client/resources/native
-                rm -f src/client/resources/native/*.dll
-                rm -f src/client/resources/native/*.so
-                rm -f src/client/resources/native/*.dylib
+                mkdir -p versions/26.1.2-fabric/src/client/resources/native
+                rm -f versions/26.1.2-fabric/src/client/resources/native/*.dll
+                rm -f versions/26.1.2-fabric/src/client/resources/native/*.so
+                rm -f versions/26.1.2-fabric/src/client/resources/native/*.dylib
             
             - name: Download all native artifacts
               uses: actions/download-artifact@v4
@@ -132,11 +132,12 @@ jobs:
 
             - name: Merge natives into project
               run: |
-                find natives -type f ! -path "*/espeak-ng-data/*" -exec cp {} src/client/resources/native/ \;
-                cp -r natives/espeak-ng-data/* src/client/resources/native/espeak-ng-data/
+                mkdir -p versions/26.1.2-fabric/src/client/resources/native/espeak-ng-data/
+                find natives -type f ! -path "*/espeak-ng-data/*" -exec cp {} versions/26.1.2-fabric/src/client/resources/native/ \;
+                cp -r natives/espeak-ng-data/* versions/26.1.2-fabric/src/client/resources/native/espeak-ng-data/
 
             - name: List native folder for debugging
-              run: ls -R src/client/resources/native
+              run: ls -R versions/26.1.2-fabric/src/client/resources/native
             
             - name: Make Gradle wrapper executable (grrr Linux grrrrrr)
               run: chmod +x ./gradlew
@@ -159,12 +160,12 @@ jobs:
                 restore-keys: gradle-cache-${{ runner.os }}-
 
             - name: Building jar
-              run: ./gradlew assemble --no-daemon
+              run: ./gradlew :26.1.2-fabric:assemble --no-daemon
             
             - name: Filter out the *.sources.jars
               run: |
                 mkdir -p out
-                for f in build/libs/*.jar; do
+                for f in versions/26.1.2-fabric/build/libs/*.jar; do
                     if [[ "$f" != *-sources.jar ]]; then
                         mv "$f" out/
                     fi
